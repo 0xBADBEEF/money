@@ -1,11 +1,9 @@
 #!/bin/python2
 
-from get_exchange_rates import ExchangeRates
+from parser import StringMath
 
+print "Enter val:"
+val = raw_input()
 
-print "Enter currency:"
-cur = raw_input()
-cur = cur.upper()
-
-er = ExchangeRates(cur)
-print er.get_currency()
+sm = StringMath(val)
+print sm.eval()
