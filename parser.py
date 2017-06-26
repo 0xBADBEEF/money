@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import string
+from datetime import date
 from exchange import *
 from server_service import ServerService
 
@@ -8,8 +9,8 @@ class WrongCurrency(Exception):
     pass
 
 class Parser(object):
-    def __init__(self, str):
-        service = ServerService()
+    def __init__(self, str, modifier):
+        service = ServerService(modifier)
         curs = service.get_currencies()
         s = str.split()
         cur = self.__prepare_cur(s[1])
@@ -28,15 +29,18 @@ class Parser(object):
     def get_nominal(self):
         return self.__val
 
+
 class StringMath(object):
-    def __init__(self, str):
+    def __init__(self, str, day = None):
+        if day is None:
+            day = date.today().strftime('%d.%m.%Y')
         self.__ops = []
         cur_str = ''
         cur_op = '+'
         for symbol in str:
             if symbol == '+' or symbol == '-':
-                p = Parser(cur_str)
-                er = ExchangeRates(p.get_currency())
+                p = Parser(cur_str, day)
+                er = ExchangeRates(p.get_currency(), day)
                 op = (cur_op, float(er.get_rate()) * p.get_nominal())
                 self.__ops.append(op)
                 cur_str = ''
@@ -44,8 +48,8 @@ class StringMath(object):
                 continue
             cur_str += symbol
 
-        p = Parser(cur_str)
-        er = ExchangeRates(p.get_currency())
+        p = Parser(cur_str, day)
+        er = ExchangeRates(p.get_currency(), day)
         op = (cur_op, float(er.get_rate()) * p.get_nominal())
         self.__ops.append(op)
 

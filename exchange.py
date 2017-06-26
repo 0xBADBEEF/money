@@ -8,8 +8,8 @@ class BaseCurrency(object):
         return 'RUR'
 
 class ExchangeRates(object):
-    def __init__(self, currency):
-        self.__service = ServerService()
+    def __init__(self, currency, day):
+        self.__service = ServerService(day)
         self.__currency = currency
 
     def get_rate(self):

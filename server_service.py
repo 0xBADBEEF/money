@@ -5,19 +5,31 @@ import requests
 import re
 
 class ServerService(object):
-    def __init__(self):
-        response = requests.get('http://www.banki.ru/products/currency/cb/')
+    SITE_BASE = 'https://www.cbr.ru/currency_base/daily.aspx?date_req='
+    def __init__(self, modifier):
+        response = requests.get(self.SITE_BASE + modifier)
         self.__soup = BeautifulSoup(response.text, 'lxml')
 
     def get_currencies(self):
         curs = []
-        for string in self.__soup.find_all(attrs={'data-currency-code' : True}):
-            curs.append(string.get('data-currency-code'))
+        for data in self.__soup.find(attrs={'class' : 'data'}):
+            for string in data:
+                cur = re.search('[A-Z]{3}', unicode(string))
+                if cur is not None:
+                    curs.append(cur.group(0))
+
         return curs
 
     def get_cur_value(self, cur):
-        for string in self.__soup.find_all(attrs={'data-currency-code' : cur}):
-            cur_val = re.search('\d+\.\d\d\d\d', string.text)
-            if cur_val is not None:
-                return cur_val.group(0)
+        data = self.__soup.find_all('tr')
+        for strings in data:
+            c = re.search('<td>' + cur + '</td>', unicode(strings))
+            if c is None:
+                continue
+
+            for str in strings.find_all('td'):
+                cur_val = re.search('\d+\,\d\d\d\d', unicode(str))
+                if cur_val is not None:
+                    return re.sub(',', '.', cur_val.group(0))
+
         return None
