@@ -2,7 +2,10 @@
 
 from parser import *
 from exchange import ExchangeRates
+from storage import Storage
 import string
+
+s = Storage()
 
 print "Enter val:"
 val = raw_input()
