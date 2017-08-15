@@ -9,6 +9,7 @@ class Storage(object):
     VALS = " VALUES "
     SELECT_ALL = "SELECT * FROM "
     WHERE = " WHERE "
+    AND = " AND "
 
     def __init__(self):
         self.conn = sqlite3.connect(self.DB_FILE)
@@ -16,22 +17,47 @@ class Storage(object):
 
     # args - array of typles (field name, type)
     def create_table(self, name, *args):
-        pass
+        cmd = self.CREATE + name + ' ('
+        add_comma = False
+        for item in args:
+            if add_comma is True:
+                cmd += ', '
+            cmd += item[0] + ' ' + item[1]
+            add_comma = True
+        cmd += ');'
+        self.c.execute(cmd)
 
     # args - array of arguments to insert
     def insert(self, table, *args):
-        pass
+        cmd = self.INSERT + table + self.VALS + '('
+        add_comma = False
+        for item in args:
+            if add_comma is True:
+                cmd += ', '
+            cmd += "'" + item + "'"
+            add_comma = True
+        cmd += ');'
+        self.c.execute(cmd)
 
     # array - array of typles to insert
     def insert_array(self, table, array):
         pass
 
     def select_all(self, table):
-        pass
+        cmd = self.SELECT_ALL + table
+        return self.c.execute(cmd)
 
     # params - array of typles (field name, field value)
-    def select(self, table, *params):
-        pass
+    def select_and(self, table, *params):
+        cmd = self.SELECT_ALL + table + self.WHERE
+        add_and = False
+        for item in params:
+            if add_and is True:
+                cmd += self.AND
+            cmd += item[0] + " = '" + item[1] + "'"
+            add_and = True
+        cmd += ';'
+        return self.c.execute(cmd)
 
     # TODO Try to remove it
     def close(self):
