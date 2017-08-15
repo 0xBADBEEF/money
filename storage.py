@@ -34,7 +34,7 @@ class Storage(object):
         for item in args:
             if add_comma is True:
                 cmd += ', '
-            cmd += "'" + item + "'"
+            cmd += "'" + str(item) + "'"
             add_comma = True
         cmd += ');'
         self.c.execute(cmd)
